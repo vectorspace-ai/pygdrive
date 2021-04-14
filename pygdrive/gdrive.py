@@ -1,77 +1,152 @@
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from os.path import join
+from os import path
 from googleapiclient.http import MediaFileUpload
 
-SCOPES = ['https://www.googleapis.com/auth/drive']
-SERVICE_ACCOUNT_FILE = 'coinmetro-309919-3921c791278f.json'
-DATASOURCE_PATH = '../storage/data_storage/'
-MODELS_PATH = '../storage/model_storage/word2vec/'
+#TODO SCOPES
 
 class Gdrive:
-    """ A class represent google drive """
-    def __init__(self, credentials):
+    """ A class represent google drive. """
+
+    def __init__(self, credentials_filepath, scopes, download_path, upload_path):
+        """
+        :str credentials_filepath: The path to the service account json file.
+        :str scopes:  User-defined scopes to request during the
+                authorization grant.
+        :str download_path: The path to the download folder.
+        :str upload_path: The path to the upload folder.
+        """
         self.service = None
-        self.credentials = credentials
+        self.credentials_filepath = credentials_filepath
+        self.scopes = scopes
+        self.download_path = download_path
+        self.upload_path = upload_path
         self.connect()
 
     def connect(self):
+        """
+        Creates a Credentials instance from a service account json file.
+        :return: None
+        """
         credentials = service_account.Credentials.from_service_account_file(
-            self.credentials, scopes=SCOPES)
+            self.credentials_filepath, scopes=self.scopes)
         self.service = build('drive', 'v3', credentials=credentials)
 
+    def check_is_folder_exist(self, folder_name):
+        """
+        Checking if folder with specified name exist.
+        :str folder_name: Name of the folder which should be search.
+        :return: True if folder found. Otherwise False.
+        """
+        folder_search = "mimeType = 'application/vnd.google-apps.folder'"
+        results = self.service.files().list(fields="nextPageToken, files(id, name)", orderBy='createdTime',
+                                            q=f"name contains '{folder_name}' and {folder_search}").execute()
+        item = results.get('files', [])
+        if item:
+            return True
+        return False
 
-    def find_object(self, list_obj_name, is_folder):
-        ids = []
-        lst_title = []
+    def check_is_file_exist(self, file_name):
+        """
+        Checking if file with specified name exist.
+        :str file_name: Name of the file which should be search.
+        :return: True if file found. Otherwise False.
+        """
+        file_search = "mimeType != 'application/vnd.google-apps.folder'"
+        results = self.service.files().list(fields="nextPageToken, files(id, name)", orderBy='createdTime',
+                                            q=f"name = '{file_name}' and {file_search}").execute()
+        item = results.get('files', [])
+        if item:
+            return True
+        return False
 
-        if is_folder:
-            folder_search = "mimeType = 'application/vnd.google-apps.folder'"
-        else:
-            folder_search = "mimeType != 'application/vnd.google-apps.folder'"
-        for obj_name in list_obj_name:
+    def find_folder(self, folder_name):
+        """
+        Searching for folder name.
+        :str folder_name: Name of the folder which should be search.
+        :return: id, name of the founded folder.
+        """
+        folder_search = "mimeType = 'application/vnd.google-apps.folder'"
+        results = self.service.files().list(fields="nextPageToken, files(id, name)", orderBy='createdTime',
+                                            q=f"name = '{folder_name}' and {folder_search}").execute()
+        item = results.get('files', [])
+        return item[-1]['id'], item[-1]['name']
 
-            results = self.service.files().list(fields="nextPageToken, files(id, name)", orderBy='createdTime',
-                                           q=f"name contains '{obj_name}' and {folder_search}").execute()
-            newest_item = results.get('files', [])['files'][-1]
-            ids.append(newest_item['id'])
-            lst_title.append(newest_item['name'])
-        return ids
+    def find_file(self, file_name):
+        """
+        Searching for file name.
+        :str file_name: Name of the file which should be search.
+        :return: id, name of the founded folder.
+        """
+        file_search = "mimeType != 'application/vnd.google-apps.folder'"
+        results = self.service.files().list(fields="nextPageToken, files(id, name)", orderBy='createdTime',
+                                            q=f"name = '{file_name}' and {file_search}").execute()
+        item = results.get('files', [])
+        return item[-1]['id'], item[-1]['name']
 
+    def find_file_in_folder(self, folder_id):
+        """
+        Searching for last files sorted by createdTime inside folder.
+        :str folder_id: : Id of the folder.
+        :return: id, name of the founded file.
+        """
+        file_search = "mimeType != 'application/vnd.google-apps.folder'"
+        results = self.service.files().list(fields="nextPageToken, files(id, name)", orderBy='createdTime',
+                                            q=f"{folder_id} in parents and {file_search}").execute()
+        item = results.get('files', [])
+        return item[-1]['id'], item[-1]['name']
 
-    def download_files(self, list_obj_name):
-        ids, titles = self.find_object(list_obj_name, False)
-        for file_id, t in zip(ids, titles):
-            request = self.service.files().get_media(fileId=file_id)
-            response = request.execute()
-            with open(join(DATASOURCE_PATH, t), "wb") as wer:
-                wer.write(response)
-        return titles
+    def download_file(self, file_id, file_name):
+        """
+        Download file by file_id.
+        :str file_id: Id of the file.
+        :str file_name: Name of the file.
+        :return: None
+        """
+        request = self.service.files().get_media(fileId=file_id)
+        response = request.execute()
+        with open(path.join(self.download_path, file_name), "wb") as wer:
+            wer.write(response)
 
-    def get_parents_id(self, name):
-        return self.find_object(name, True)[0]
-
-    def create_folder(self, folder_name, folder_id):
+    def create_folder(self, folder_id, folder_name):
+        """
+         Create folder inside parent folder.
+        :str folder_id: Parent folder id.
+        :str folder_name: Folder name.
+        :return: None
+        """
         file_metadata = {
             'name': folder_name,
             'mimeType': 'application/vnd.google-apps.folder',
             'parents': [folder_id]
         }
         file = self.service.files().create(body=file_metadata,
-                                      fields='id').execute()
+                                           fields='id').execute()
 
-    def upload_file(self, folder_id, file_path):
-        filename = file_path.split('/')[-1]
+    def upload_file(self, folder_id, file_name):
+        """
+        Upload file to folder with folder_id.
+        :str folder_id: Parent id.
+        :str file_name: File name.
+        :return: None
+        """
+
         file_metadata = {
-            'name': filename,
+            'name': file_name,
             'parents': [folder_id]
         }
-        media = MediaFileUpload(file_path,
+        media = MediaFileUpload(path.join(self.upload_path, file_name),
                                 resumable=True)
         file = self.service.files().create(body=file_metadata,
-                                      media_body=media,
-                                      fields='id').execute()
-
-gdrive_object = Gdrive(SERVICE_ACCOUNT_FILE)
+                                           media_body=media,
+                                           fields='id').execute()
 
 
+SCOPES = ['https://www.googleapis.com/auth/drive']
+CREDENTIALS_FILEPATH = '../coinmetro-309919-3921c791278f.json'
+DOWNLOAD_PATH = '../upload_download_dir/'
+UPLOAD_PATH = '../upload_download_dir/'
+
+gdrive_object = Gdrive(CREDENTIALS_FILEPATH, SCOPES, DOWNLOAD_PATH, UPLOAD_PATH)
+
+print(gdrive_object.find_file('2021-04-13T18:56+0200_coingecko_data.csv'))
