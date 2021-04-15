@@ -8,7 +8,7 @@ from googleapiclient.http import MediaFileUpload
 class Gdrive:
     """ A class represent google drive. """
 
-    def __init__(self, credentials_filepath, scopes, download_path, upload_path):
+    def __init__(self, credentials_filepath, scopes, download_dir, upload_dir):
         """
         :str credentials_filepath: The path to the service account json file.
         :str scopes:  User-defined scopes to request during the
@@ -19,8 +19,8 @@ class Gdrive:
         self.service = None
         self.credentials_filepath = credentials_filepath
         self.scopes = scopes
-        self.download_path = download_path
-        self.upload_path = upload_path
+        self.download_dir = download_dir
+        self.upload_dir = upload_dir
         self.connect()
 
     def connect(self):
@@ -105,7 +105,7 @@ class Gdrive:
         """
         request = self.service.files().get_media(fileId=file_id)
         response = request.execute()
-        with open(path.join(self.download_path, file_name), "wb") as wer:
+        with open(path.join(self.download_dir, file_name), "wb") as wer:
             wer.write(response)
 
     def create_folder(self, folder_id, folder_name):
@@ -135,26 +135,10 @@ class Gdrive:
             'name': file_name,
             'parents': [folder_id]
         }
-        media = MediaFileUpload(path.join(self.upload_path, file_name),
+        media = MediaFileUpload(path.join(self.upload_dir, file_name),
                                 resumable=True)
         file = self.service.files().create(body=file_metadata,
                                            media_body=media,
                                            fields='id').execute()
 
 
-# SCOPES = ['https://www.googleapis.com/auth/drive']
-# CREDENTIALS_FILEPATH = '../coinmetro-309919-3921c791278f.json'
-# DOWNLOAD_PATH = '../upload_download_dir/'
-# UPLOAD_PATH = '../upload_download_dir/'
-#
-# gdrive_object = Gdrive(CREDENTIALS_FILEPATH, SCOPES, DOWNLOAD_PATH, UPLOAD_PATH)
-#
-# #Download
-# file_id, file_name = gdrive_object.find_file('2021-04-13T18:56+0200_coingecko_data.csv')
-# gdrive_object.download_file(file_id, file_name)
-#
-# print('upload')
-# #Upload
-# folder_id, _ = gdrive_object.find_folder('coingecko')
-# print(folder_id)
-# gdrive_object.upload_file(folder_id, 'file_test2.csv')
