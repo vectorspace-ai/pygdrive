@@ -142,11 +142,19 @@ class Gdrive:
                                            fields='id').execute()
 
 
-SCOPES = ['https://www.googleapis.com/auth/drive']
-CREDENTIALS_FILEPATH = '../coinmetro-309919-3921c791278f.json'
-DOWNLOAD_PATH = '../upload_download_dir/'
-UPLOAD_PATH = '../upload_download_dir/'
-
-gdrive_object = Gdrive(CREDENTIALS_FILEPATH, SCOPES, DOWNLOAD_PATH, UPLOAD_PATH)
-
-print(gdrive_object.find_file('2021-04-13T18:56+0200_coingecko_data.csv'))
+# SCOPES = ['https://www.googleapis.com/auth/drive']
+# CREDENTIALS_FILEPATH = '../coinmetro-309919-3921c791278f.json'
+# DOWNLOAD_PATH = '../upload_download_dir/'
+# UPLOAD_PATH = '../upload_download_dir/'
+#
+# gdrive_object = Gdrive(CREDENTIALS_FILEPATH, SCOPES, DOWNLOAD_PATH, UPLOAD_PATH)
+#
+# #Download
+# file_id, file_name = gdrive_object.find_file('2021-04-13T18:56+0200_coingecko_data.csv')
+# gdrive_object.download_file(file_id, file_name)
+#
+# print('upload')
+# #Upload
+# folder_id, _ = gdrive_object.find_folder('coingecko')
+# print(folder_id)
+# gdrive_object.upload_file(folder_id, 'file_test2.csv')
