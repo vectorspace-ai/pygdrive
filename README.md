@@ -25,17 +25,23 @@ You can install pygdrive from the current development version from GitHub, use:
 pip install git+https://github.com/vectorspace-ai/pygdrive.git
 ```
 
+Creating credentials.json file
+---------------------------
+
+Download client_secrets.json from Google API Console. 
+Share your Drive account's folder to your service account.
+Your service account's addresss looks like XXX@XXX.iam.gserviceaccount.com.
+Then your service account can see the shared folder from your Drive account.
+
 Сreating Gdrive object
 ---------------
-
-Download *credentials.json* from Vectorspace AI engineers google drive shared folder. 
 
 ```python
   from pygdrive import Gdrive
   SCOPES = ['https://www.googleapis.com/auth/drive']
   CREDENTIALS_FILEPATH = 'credentials.json'
-  DOWNLOAD_DIR = 'storage/data_storage/'
-  UPLOAD_DIR = 'storage/data_storage/'
+  DOWNLOAD_DIR = 'download_dir/'
+  UPLOAD_DIR = 'upload_dir/'
   gdrive_object = Gdrive(CREDENTIALS_FILEPATH, SCOPES, DOWNLOAD_DIR, UPLOAD_DIR)
   ```
 
