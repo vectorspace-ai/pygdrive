@@ -1,0 +1,4 @@
+test_config_file: '../tests/configs/test_credentials.json'
+scope: 'https://www.googleapis.com/auth/drive'
+download_dir: '../download_test_dir/'
+upload_dir: '../upload_test_dir/'
