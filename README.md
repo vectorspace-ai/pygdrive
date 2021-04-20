@@ -5,7 +5,6 @@ pygdrive is a wrapper library of [google-api-python-clien](https://github.com/go
 Project Info
 ------------
 
-- Documentation: 
 - GitHub: [https://github.com/vectorspace-ai/pygdrive](https://github.com/vectorspace-ai/pygdrive)
 
 Features of pygdrive
