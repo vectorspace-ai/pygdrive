@@ -10,9 +10,9 @@ Project Info
 Features of pygdrive
 -------------------
 
--  Simplifies OAuth2.0 with service_account into just few lines with flexible settings.
+-  Simplifies OAuth2.0 with service_account into just a few lines with flexible settings.
 -  Wraps [Google Drive API](https://developers.google.com/drive/api/v3/>) into
-   class which can search, upload and download files and folders.
+   a class which can search, upload and download files and folders.
 
 
 How to install
@@ -52,7 +52,7 @@ File management made easy
 
 Upload file to certain folder:
 
-Make sure that folder exist and filename appears in UPLOAD_DIR
+Make sure that folder exists and filename appears in UPLOAD_DIR
 
 ```python   
 folder_id, _ = gdrive_object.find_folder('coingecko')
@@ -66,7 +66,7 @@ parent_id = 'PARENT ID'
 folder_id = gdrive_object.create_folder(parent_id, 'folder_name')
 ```
 
-Make sure that DOWNLOAD_DIR exist and filename.extension in google drive folder. 
+Make sure that DOWNLOAD_DIR exists and filename.extension in google drive folder. 
 
 ```python
 file_id, file_name = gdrive_object.find_file('filename.extension')
