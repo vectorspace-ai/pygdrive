@@ -3,7 +3,6 @@ from googleapiclient.discovery import build
 from os import path
 from googleapiclient.http import MediaFileUpload
 
-#TODO SCOPES
 
 class Gdrive:
     """ A class represent google drive. """
@@ -32,7 +31,7 @@ class Gdrive:
             self.credentials_filepath, scopes=self.scopes)
         self.service = build('drive', 'v3', credentials=credentials)
 
-    def check_is_folder_exist(self, folder_name):
+    def check_does_folder_exist(self, folder_name):
         """
         Checking if folder with specified name exist.
         :str folder_name: Name of the folder which should be search.
@@ -46,7 +45,7 @@ class Gdrive:
             return True
         return False
 
-    def check_is_file_exist(self, file_name):
+    def check_does_file_exist(self, file_name):
         """
         Checking if file with specified name exist.
         :str file_name: Name of the file which should be search.
@@ -103,32 +102,34 @@ class Gdrive:
         :str file_name: Name of the file.
         :return: None
         """
-        request = self.service.files().get_media(fileId=file_id)
-        response = request.execute()
+        file_body = self.service.files().get_media(fileId=file_id).execute()
         with open(path.join(self.download_dir, file_name), "wb") as wer:
-            wer.write(response)
+            wer.write(file_body)
 
-    def create_folder(self, folder_id, folder_name):
+    def create_folder(self, parent_id, folder_name):
         """
          Create folder inside parent folder.
-        :str folder_id: Parent folder id.
+        :str parent_id: Parent folder id.
         :str folder_name: Folder name.
-        :return: None
+        :return: id of the folder
         """
+
         file_metadata = {
             'name': folder_name,
             'mimeType': 'application/vnd.google-apps.folder',
-            'parents': [folder_id]
+            'parents': [parent_id]
         }
         file = self.service.files().create(body=file_metadata,
                                            fields='id').execute()
+        return file['id']
+
 
     def upload_file(self, folder_id, file_name):
         """
         Upload file to folder with folder_id.
         :str folder_id: Parent id.
         :str file_name: File name.
-        :return: None
+        :return: id of the file
         """
 
         file_metadata = {
@@ -140,5 +141,12 @@ class Gdrive:
         file = self.service.files().create(body=file_metadata,
                                            media_body=media,
                                            fields='id').execute()
+        return file['id']
 
-
+    # def delete_file(self, file_id):
+    #     """
+    #     delete file or folder by id
+    #     :int file_id: Id of the file to be deleted
+    #     :return: None
+    #     """
+    #     self.service.files().delete(fileId=file_id).execute()
