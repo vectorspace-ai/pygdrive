@@ -39,7 +39,6 @@ Download *credentials.json* from Vectorspace AI engineers google drive shared fo
   gdrive_object = Gdrive(CREDENTIALS_FILEPATH, SCOPES, DOWNLOAD_DIR, UPLOAD_DIR)
   ```
 
-
 File management made easy
 -------------------------
 
@@ -51,7 +50,13 @@ Make sure that folder exist and filename appears in UPLOAD_DIR
 folder_id, _ = gdrive_object.find_folder('coingecko')
 gdrive_object.upload_file(folder_id, 'filename.extension')
 ```
-Download file to certain folder:
+
+Create folder:
+
+```python   
+parent_id = 'PARENT ID'
+folder_id = gdrive_object.create_folder(parent_id, 'folder_name')
+```
 
 Make sure that DOWNLOAD_DIR exist and filename.extension in google drive folder. 
 
