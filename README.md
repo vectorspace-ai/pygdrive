@@ -18,7 +18,10 @@ Features of pygdrive
 
 How to install
 --------------
-
+You can install PyDrive with regular pip command.
+```python
+pip install pygdrive
+```
 You can install pygdrive from the current development version from GitHub, use:
 
 ```python
