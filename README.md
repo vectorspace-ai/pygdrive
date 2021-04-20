@@ -1,6 +1,6 @@
 # pygdrive
 
-pygdrive is a wrapper library of [google-api-python-clien](https://github.com/google/google-api-python-client) that simplifies uploading and downloading files. 
+pygdrive is a wrapper library of [google-api-python-client](https://github.com/google/google-api-python-client) that simplifies uploading and downloading files. 
 
 Project Info
 ------------
