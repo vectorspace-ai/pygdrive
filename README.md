@@ -59,7 +59,7 @@ folder_id, _ = gdrive_object.find_folder('coingecko')
 gdrive_object.upload_file(folder_id, 'filename.extension')
 ```
 
-You could specify your local upload path if it different from UPLOAD_DIR:
+You could specify your local upload path if it differs from UPLOAD_DIR:
 
 ```python   
 folder_id, _ = gdrive_object.find_folder('coingecko')
@@ -80,7 +80,7 @@ file_id, file_name = gdrive_object.find_file('filename.extension')
 gdrive_object.download_file(file_id, file_name)
 ```
 
-You could specify your local download path if it different from DOWNLOAD_DIR:
+You could specify your local download path if it differs from DOWNLOAD_DIR:
 
 ```python   
 file_id, file_name = gdrive_object.find_file('filename.extension')
