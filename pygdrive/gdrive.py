@@ -124,7 +124,7 @@ class Gdrive:
             .list(
                 fields="nextPageToken, files(id, name)",
                 orderBy="createdTime",
-                q=f"{folder_id} in parents and {file_search}",
+                q=f"'{folder_id}' in parents and {file_search}",
             )
             .execute()
         )
@@ -143,7 +143,7 @@ class Gdrive:
             .list(
                 fields="nextPageToken, files(id, name)",
                 orderBy="createdTime",
-                q=f"{folder_id} in parents and {file_search}",
+                q=f"'{folder_id}' in parents and {file_search}",
             )
             .execute()
         )
@@ -212,3 +212,5 @@ class Gdrive:
     #     :return: None
     #     """
     #     self.service.files().delete(fileId=file_id).execute()
+
+
