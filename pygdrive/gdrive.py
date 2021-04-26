@@ -5,7 +5,7 @@ from googleapiclient.http import MediaFileUpload
 
 
 class Gdrive:
-    """ A class represent google drive. """
+    """A class represent google drive."""
 
     def __init__(self, credentials_filepath, scopes, download_dir, upload_dir):
         """
@@ -28,8 +28,9 @@ class Gdrive:
         :return: None
         """
         credentials = service_account.Credentials.from_service_account_file(
-            self.credentials_filepath, scopes=self.scopes)
-        self.service = build('drive', 'v3', credentials=credentials)
+            self.credentials_filepath, scopes=self.scopes
+        )
+        self.service = build("drive", "v3", credentials=credentials)
 
     def check_does_folder_exist(self, folder_name):
         """
@@ -38,9 +39,16 @@ class Gdrive:
         :return: True if folder found. Otherwise False.
         """
         folder_search = "mimeType = 'application/vnd.google-apps.folder'"
-        results = self.service.files().list(fields="nextPageToken, files(id, name)", orderBy='createdTime',
-                                            q=f"name contains '{folder_name}' and {folder_search}").execute()
-        item = results.get('files', [])
+        results = (
+            self.service.files()
+            .list(
+                fields="nextPageToken, files(id, name)",
+                orderBy="createdTime",
+                q=f"name contains '{folder_name}' and {folder_search}",
+            )
+            .execute()
+        )
+        item = results.get("files", [])
         if item:
             return True
         return False
@@ -52,9 +60,16 @@ class Gdrive:
         :return: True if file found. Otherwise False.
         """
         file_search = "mimeType != 'application/vnd.google-apps.folder'"
-        results = self.service.files().list(fields="nextPageToken, files(id, name)", orderBy='createdTime',
-                                            q=f"name = '{file_name}' and {file_search}").execute()
-        item = results.get('files', [])
+        results = (
+            self.service.files()
+            .list(
+                fields="nextPageToken, files(id, name)",
+                orderBy="createdTime",
+                q=f"name = '{file_name}' and {file_search}",
+            )
+            .execute()
+        )
+        item = results.get("files", [])
         if item:
             return True
         return False
@@ -66,10 +81,17 @@ class Gdrive:
         :return: id, name of the founded folder.
         """
         folder_search = "mimeType = 'application/vnd.google-apps.folder'"
-        results = self.service.files().list(fields="nextPageToken, files(id, name)", orderBy='createdTime',
-                                            q=f"name = '{folder_name}' and {folder_search}").execute()
-        item = results.get('files', [])
-        return item[-1]['id'], item[-1]['name']
+        results = (
+            self.service.files()
+            .list(
+                fields="nextPageToken, files(id, name)",
+                orderBy="createdTime",
+                q=f"name = '{folder_name}' and {folder_search}",
+            )
+            .execute()
+        )
+        item = results.get("files", [])
+        return item[-1]["id"], item[-1]["name"]
 
     def find_file(self, file_name):
         """
@@ -78,32 +100,70 @@ class Gdrive:
         :return: id, name of the founded folder.
         """
         file_search = "mimeType != 'application/vnd.google-apps.folder'"
-        results = self.service.files().list(fields="nextPageToken, files(id, name)", orderBy='createdTime',
-                                            q=f"name = '{file_name}' and {file_search}").execute()
-        item = results.get('files', [])
-        return item[-1]['id'], item[-1]['name']
+        results = (
+            self.service.files()
+            .list(
+                fields="nextPageToken, files(id, name)",
+                orderBy="createdTime",
+                q=f"name = '{file_name}' and {file_search}",
+            )
+            .execute()
+        )
+        item = results.get("files", [])
+        return item[-1]["id"], item[-1]["name"]
 
-    def find_file_in_folder(self, folder_id):
+    def get_files_in_folder(self, folder_id):
         """
-        Searching for last files sorted by createdTime inside folder.
+        Searching for all files sorted by createdTime inside folder.
         :str folder_id: : Id of the folder.
-        :return: id, name of the founded file.
+        :return: [{"id":"str", "name":"str"}]
         """
         file_search = "mimeType != 'application/vnd.google-apps.folder'"
-        results = self.service.files().list(fields="nextPageToken, files(id, name)", orderBy='createdTime',
-                                            q=f"{folder_id} in parents and {file_search}").execute()
-        item = results.get('files', [])
-        return item[-1]['id'], item[-1]['name']
+        results = (
+            self.service.files()
+            .list(
+                fields="nextPageToken, files(id, name)",
+                orderBy="createdTime",
+                q=f"{folder_id} in parents and {file_search}",
+            )
+            .execute()
+        )
+        item = results.get("files", [])
+        return item
 
-    def download_file(self, file_id, file_name):
+    def get_dirs_in_folder(self, folder_id):
+        """
+        Searching for all folders sorted by createdTime inside folder.
+        :str folder_id: : Id of the folder.
+        :return: [{"id":"str", "name":"str"}]
+        """
+        file_search = "mimeType = 'application/vnd.google-apps.folder'"
+        results = (
+            self.service.files()
+            .list(
+                fields="nextPageToken, files(id, name)",
+                orderBy="createdTime",
+                q=f"{folder_id} in parents and {file_search}",
+            )
+            .execute()
+        )
+        item = results.get("files", [])
+        return item
+
+    def download_file(self, file_id, file_name, download_path=None):
         """
         Download file by file_id.
         :str file_id: Id of the file.
         :str file_name: Name of the file.
+        :str download_path: The path to the download folder. If None download path will be taken from self.download_dir
         :return: None
         """
+        if download_path:
+            path_dir = path.join(download_path, file_name)
+        else:
+            path_dir = path.join(self.download_dir, file_name)
         file_body = self.service.files().get_media(fileId=file_id).execute()
-        with open(path.join(self.download_dir, file_name), "wb") as wer:
+        with open(path_dir, "wb") as wer:
             wer.write(file_body)
 
     def create_folder(self, parent_id, folder_name):
@@ -115,33 +175,35 @@ class Gdrive:
         """
 
         file_metadata = {
-            'name': folder_name,
-            'mimeType': 'application/vnd.google-apps.folder',
-            'parents': [parent_id]
+            "name": folder_name,
+            "mimeType": "application/vnd.google-apps.folder",
+            "parents": [parent_id],
         }
-        file = self.service.files().create(body=file_metadata,
-                                           fields='id').execute()
-        return file['id']
+        file = self.service.files().create(body=file_metadata, fields="id").execute()
+        return file["id"]
 
-
-    def upload_file(self, folder_id, file_name):
+    def upload_file(self, folder_id, file_name, upload_path=None):
         """
         Upload file to folder with folder_id.
         :str folder_id: Parent id.
         :str file_name: File name.
+        :str upload_path: The path to the upload folder. If None upload path will be taken from self.upload_dir
         :return: id of the file
         """
 
-        file_metadata = {
-            'name': file_name,
-            'parents': [folder_id]
-        }
-        media = MediaFileUpload(path.join(self.upload_dir, file_name),
-                                resumable=True)
-        file = self.service.files().create(body=file_metadata,
-                                           media_body=media,
-                                           fields='id').execute()
-        return file['id']
+        if upload_path:
+            path_dir = path.join(upload_path, file_name)
+        else:
+            path_dir = path.join(self.upload_dir, file_name)
+
+        file_metadata = {"name": file_name, "parents": [folder_id]}
+        media = MediaFileUpload(path_dir, resumable=True)
+        file = (
+            self.service.files()
+            .create(body=file_metadata, media_body=media, fields="id")
+            .execute()
+        )
+        return file["id"]
 
     # def delete_file(self, file_id):
     #     """
