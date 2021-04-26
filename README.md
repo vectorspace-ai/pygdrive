@@ -59,6 +59,13 @@ folder_id, _ = gdrive_object.find_folder('coingecko')
 gdrive_object.upload_file(folder_id, 'filename.extension')
 ```
 
+You could specify your local upload path if it different from UPLOAD_DIR:
+
+```python   
+folder_id, _ = gdrive_object.find_folder('coingecko')
+gdrive_object.upload_file(folder_id, 'filename.extension', 'upload_storage/')
+```
+
 Create folder:
 
 ```python   
@@ -72,4 +79,12 @@ Make sure that DOWNLOAD_DIR exists and filename.extension in google drive folder
 file_id, file_name = gdrive_object.find_file('filename.extension')
 gdrive_object.download_file(file_id, file_name)
 ```
+
+You could specify your local download path if it different from DOWNLOAD_DIR:
+
+```python   
+file_id, file_name = gdrive_object.find_file('filename.extension')
+gdrive_object.download_file(file_id, file_name, 'some_updated_local_path/')
+```
+
 After uploading/downloading files you should expect uploaded/downloaded file.
