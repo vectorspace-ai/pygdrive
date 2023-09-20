@@ -2,14 +2,15 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from os import path
 from googleapiclient.http import MediaFileUpload
-
+import json
 
 class Gdrive:
     """A class represent google drive."""
 
-    def __init__(self, credentials_filepath, scopes, download_dir, upload_dir):
+    def __init__(self, credentials_filepath=None, credentials_env_var=None, scopes=None, download_dir=None, upload_dir=None):
         """
         :str credentials_filepath: The path to the service account json file.
+        :str credentials_env_var: Use an environment variable to provide service account credentials.
         :str scopes:  User-defined scopes to request during the
                 authorization grant.
         :str download_path: The path to the download folder.
@@ -17,6 +18,7 @@ class Gdrive:
         """
         self.service = None
         self.credentials_filepath = credentials_filepath
+        self.credentials_env_var = credentials_env_var
         self.scopes = scopes
         self.download_dir = download_dir
         self.upload_dir = upload_dir
@@ -24,12 +26,18 @@ class Gdrive:
 
     def connect(self):
         """
-        Creates a Credentials instance from a service account json file.
+        Creates a Credentials instance from a service account json file or an environment variable
         :return: None
         """
-        credentials = service_account.Credentials.from_service_account_file(
-            self.credentials_filepath, scopes=self.scopes
-        )
+        if self.credentials_env_var is not None:
+            service_account_info = json.loads(self.credentials_env_var)
+            credentials = service_account.Credentials.from_service_account_info(
+                service_account_info, scopes=self.scopes
+            )
+        else:
+            credentials = service_account.Credentials.from_service_account_file(
+                self.credentials_filepath, scopes=self.scopes
+            )
         self.service = build("drive", "v3", credentials=credentials)
 
     def check_does_folder_exist(self, folder_name):
