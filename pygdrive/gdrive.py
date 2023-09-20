@@ -3,8 +3,6 @@ from googleapiclient.discovery import build
 from os import path
 from googleapiclient.http import MediaFileUpload
 import json
-import os
-
 
 class Gdrive:
     """A class represent google drive."""
@@ -32,7 +30,7 @@ class Gdrive:
         :return: None
         """
         if self.credentials_env_var is not None:
-            service_account_info = json.loads(os.environ[self.credentials_env_var])
+            service_account_info = json.loads(self.credentials_env_var)
             credentials = service_account.Credentials.from_service_account_info(
                 service_account_info, scopes=self.scopes
             )
