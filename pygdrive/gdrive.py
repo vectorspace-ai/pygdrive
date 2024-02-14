@@ -127,16 +127,15 @@ class Gdrive:
         :return: id, name of the founded file.
         """
         file_search = "mimeType != 'application/vnd.google-apps.folder'"
-        results = (
+        result = (
             self.service.files()
-            .list(
-                fields="nextPageToken, files(id, name)",
-                orderBy="createdTime",
-                q=f"'{file_id}' and {file_search}",
+            .get(
+                fileId="{file_id}"
             )
             .execute()
         )
-        item = results.get("files", [])
+        print(result)
+        item = result.get("file", [])
         return item[-1]["id"], item[-1]["name"]
 
     def get_files_in_folder(self, folder_id):
