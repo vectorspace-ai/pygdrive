@@ -130,7 +130,7 @@ class Gdrive:
         result = (
             self.service.files()
             .get(
-                fileId="{file_id}"
+                fileId=file_id
             )
             .execute()
         )
