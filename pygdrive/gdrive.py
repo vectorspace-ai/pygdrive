@@ -120,6 +120,25 @@ class Gdrive:
         item = results.get("files", [])
         return item[-1]["id"], item[-1]["name"]
 
+    def find_file_by_id(self, file_id):
+        """
+        Searching for file by id.
+        :str file_id: Id of the file which should be search.
+        :return: id, name of the founded file.
+        """
+        file_search = "mimeType != 'application/vnd.google-apps.folder'"
+        results = (
+            self.service.files()
+            .list(
+                fields="nextPageToken, files(id, name)",
+                orderBy="createdTime",
+                q=f"id = '{file_id}' and {file_search}",
+            )
+            .execute()
+        )
+        item = results.get("files", [])
+        return item[-1]["id"], item[-1]["name"]
+
     def get_files_in_folder(self, folder_id):
         """
         Searching for all files sorted by createdTime inside folder.
