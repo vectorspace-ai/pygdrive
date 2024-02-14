@@ -134,9 +134,7 @@ class Gdrive:
             )
             .execute()
         )
-        print(result)
-        item = result.get("file", [])
-        return item[-1]["id"], item[-1]["name"]
+        return result["id"], result["name"]
 
     def get_files_in_folder(self, folder_id):
         """
