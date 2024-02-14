@@ -132,7 +132,7 @@ class Gdrive:
             .list(
                 fields="nextPageToken, files(id, name)",
                 orderBy="createdTime",
-                q=f"id = '{file_id}' and {file_search}",
+                q=f"'{file_id}' and {file_search}",
             )
             .execute()
         )
