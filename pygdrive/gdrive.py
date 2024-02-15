@@ -180,7 +180,7 @@ class Gdrive:
         :str folder_id: : Id of the folder.
         :return: [{"id":"str", "name":"str"}]
         """
-        file_search = f"mimeType = {mimetype}"
+        file_search = f"mimeType = '{mimetype}'"
         results = (
             self.service.files()
             .list(
