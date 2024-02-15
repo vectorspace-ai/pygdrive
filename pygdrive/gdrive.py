@@ -173,6 +173,25 @@ class Gdrive:
         )
         item = results.get("files", [])
         return item
+        
+    def get_file_in_folder_by_type(self, folder_id, mimetype):
+        """
+        Searching for all folders sorted by createdTime inside folder.
+        :str folder_id: : Id of the folder.
+        :return: [{"id":"str", "name":"str"}]
+        """
+        file_search = f"mimeType = {mimetype}"
+        results = (
+            self.service.files()
+            .list(
+                fields="nextPageToken, files(id, name)",
+                orderBy="createdTime",
+                q=f"'{folder_id}' in parents and {file_search}",
+            )
+            .execute()
+        )
+        item = results.get("files", [])
+        return item
 
     def download_file(self, file_id, file_name, download_path=None):
         """
