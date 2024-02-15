@@ -174,9 +174,9 @@ class Gdrive:
         item = results.get("files", [])
         return item
         
-    def get_file_in_folder_by_type(self, folder_id, mimetype):
+    def get_files_in_folder_by_type(self, folder_id, mimetype):
         """
-        Searching for all folders sorted by createdTime inside folder.
+        Searching for all files of mimetype sorted by createdTime inside folder.
         :str folder_id: : Id of the folder.
         :return: [{"id":"str", "name":"str"}]
         """
